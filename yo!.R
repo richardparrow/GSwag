@@ -1,4 +1,3 @@
-
 devtools::install_github("brooke-watson/BRRR")
 library(BRRR)
 
@@ -10,4 +9,3 @@ skrrrahh("khaled2")
 
 # Ma ricordatevi che...
 skrrrahh("khaled3")
-
