@@ -46,82 +46,35 @@ abline(v = log(ridgeCross$lambda.min))
 
 
 
-# LASSO
 
-print(system.time(
-  
-lassoFit <- glmnet(x = XTrain,
+####################
+# BEST RIDGE MODEL #
+####################
+
+# best ridge I have
+ridgeLambda = ridgeCross$lambda.min
+
+ridgeBest = glmnet(x = XTrain,
                    y = yTrain,
-                   alpha = 1,
+                   alpha = 0,
+                   lambda = ridgeLambda,
                    standardize = T,
                    intercept = F,
                    family = "gaussian")
 
-))
-
-# CV
-print(system.time(
-  
-lassoCross <- cv.glmnet(x = XTrain,
-                        y = yTrain,
-                        nfolds = 5,
-                        alpha = 1,
-                        standardize = T,
-                        intercept = F,
-                        family = "gaussian",
-                        type.measure = "mse",
-                        parallel = T)
-
-))
+ridgeFitted = predict.glmnet(ridgeBest, XTrain)
 
 # plot!
-plot(lassoCross)
-plot(lassoFit, xvar = "lambda")
-abline(v = log(lassoCross$lambda.min))
+plot(density(yTrain[, 1], bw = .5, from = 0))
+lines(density(ridgeFitted, bw = .5, from = 0), col = "red")
 
+# predict!
+load("modelMatrixTest_xgb.RData")
+ridgePreds = predict.glmnet(ridgeBest, XTest)
 
-# print!
-print(ridgeCross$lambda.min)
-print(lassoCross$lambda.min)
+library(dplyr)
+predSub = cbind(testIds, ridgePreds) %>% as.tibble() %>%
+  group_by(fullVisitorId) %>%
+  summarise(PredictedLogRevenue = log1p(sum(expm1(s0))))
 
-
-
-########
-# MODELS
-########
-
-# normal reg
-ridgeLambda = 0.08757387
-lassoLambda = 0.0001087208
-
-lassoBest = glmnet(x = XTrain,
-                   y = yTrain,
-                   alpha = 1,
-                   lambda = lassoLambda,
-                   standardize = T,
-                   intercept = F,
-                   family = "binomial")
-
-sparseFitted = predict.glmnet(lassoBest, XTrain)
-sparseFitted = exp(sparseFitted)/(1 + exp(sparseFitted))
-
-load("sparse_test")
-sparsePredict = predict.glmnet(lassoBest, XTest)
-sparsePredict = exp(sparsePredict)/(1 + exp(sparsePredict))
-
-
-##############
-# SUBMISSION #
-##############
-
-
-plot(density(yTrain[, 2]), lwd = 1.5)
-lines(density(sparseFitted), lwd = 1.5, col = "red")
-
-
-load("my_avito")
-sparseSub = cbind(avito_test$item_id, sparsePredict)
-colnames(sparseSub) = c("item_id", "deal_probability")
-readr::write_csv(as.data.frame(sparseSub), path = "/Users/richardparrow/Documents/R/Avito.competition/kaggle_avito/sub_PROVA_five.csv")
-
-
+readr::write_csv(predSub, path = paste0(getwd(), "/sub_ridgeProva.csv"))

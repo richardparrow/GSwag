@@ -8,8 +8,8 @@ load("trainFeatEng.RData")
 load("testFeatEng.RData")
 
 # salvo IDs
-trainIds = Matrix(as.matrix(train[, "fullVisitorId"]), sparse = T)
-testIds = Matrix(as.matrix(test[, "fullVisitorId"]), sparse = T)
+trainIds = train[, "fullVisitorId"]
+testIds = test[, "fullVisitorId"]
 
 # ricombino
 combi = rbind(train, test) %>% as.tibble()
