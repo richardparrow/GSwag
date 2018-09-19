@@ -1,4 +1,5 @@
 # libraries
+library(tidyverse)
 library(Matrix)
 
 
@@ -117,8 +118,18 @@ test = test %>%
 
 
 # preparo per modelli
+
+# ranger
 rangerXTrain = sparse.model.matrix(~ 0 + ., train)
 #rangerXTest = sparse.model.matrix(~ 0 + ., test) ~ interesting, test ha alcuni factor completamente in NA
 
 save(rangerXTrain, file = "modelMatrixTrain_ranger.RData")
+
+# xgboost e glmnet
+yTrain = Matrix(as.matrix(train[, "transactionRevenue"]), sparse = T)
+XTrain = sparse.model.matrix(transactionRevenue ~ 0 + ., train)
+# reduce da avito:
+#XTest = sparse.model.matrix(~ 0 + ., feateng_test[, !colnames(feateng_test) %in% "deal_probability"])
+
+save(yTrain, XTrain, file = "modelMatrixTrain_xgb.RData")
 
