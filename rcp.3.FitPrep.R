@@ -21,7 +21,8 @@ train = train %>%
          -keyword,
          -referralPath,
          -adContent,
-         -adwordsClickInfo.gclId) %>% # too many levels
+         -adwordsClickInfo.gclId, # too many levels
+         -domain) %>% 
   mutate(browser = browser %>% as.character(),
          operatingSystem = operatingSystem %>% as.character(),
          deviceCategory = deviceCategory %>% as.character(),
@@ -74,6 +75,7 @@ test = test %>%
          -referralPath,
          -adContent,
          -adwordsClickInfo.gclId,
+         -domain,
          -transactionRevenue) %>%
   mutate(browser = browser %>% as.character(),
          operatingSystem = operatingSystem %>% as.character(),

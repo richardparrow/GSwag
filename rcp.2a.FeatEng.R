@@ -19,11 +19,11 @@ combi = combi %>%
          wday = date %>% wday(week_start = getOption("lubridate.week.start", 1))) # così parte dal Lunedì
 
 
-# .com nel dominio
-combi = combi %>%
-  mutate(dotCom = networkDomain %>% str_detect(".com"),
-         dotNet = networkDomain %>% str_detect(".net"),
-         dotComNet = ifelse(dotCom == 0, ifelse(dotNet == 0, "None", "dotNet"), "dotCom") %>% as.factor()) 
+# .com nel dominio - per ora commentato perché suffix dovrebbe fare tutto
+#combi = combi %>%
+#  mutate(dotCom = networkDomain %>% str_detect(".com"),
+#         dotNet = networkDomain %>% str_detect(".net"),
+#         dotComNet = ifelse(dotCom == 0, ifelse(dotNet == 0, "None", "dotNet"), "dotCom") %>% as.factor()) 
 
 
 # altre robbe nel dominio
@@ -40,6 +40,15 @@ combi = cbind(combi, domainSplit$networkDomain) %>%
          suffix = suffix %>% str_remove_all("com.|net.") %>% as.factor())
 
 
+# tengo solo i suffissi che hanno mean(target) != 0
+suffixMean = combi[1:nrow(train), ] %>%
+  group_by(suffix) %>%
+  summarise(transactionMean = transactionRevenue %>% mean())
+
+suffixOther = as.character(suffixMean$suffix[which(suffixMean$transactionMean == 0)])
+
+combi = combi %>%
+  mutate(suffix = suffix %>% fct_collapse(other = suffixOther))
 
 
 ############################
