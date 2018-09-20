@@ -51,6 +51,37 @@ combi = combi %>%
   mutate(suffix = suffix %>% fct_collapse(other = suffixOther))
 
 
+# hist e pageviews dominano, provo a fare un po' di shit
+group_mean <- function(x, group) ave(x, group, FUN = function(x) mean(x, na.rm = TRUE))
+
+combi = combi %>%
+  mutate(hits.mean.visitNumber = group_mean(hits, visitNumber),
+         hits.mean.browser = group_mean(hits, browser),
+         hits.mean.operatingSystem = group_mean(hits, operatingSystem),
+         hits.mean.subContinent = group_mean(hits, subContinent),
+         hits.mean.country = group_mean(hits, country),
+         hits.mean.city = group_mean(hits, city),
+         hits.mean.metro = group_mean(hits, metro),
+         hits.mean.suffix = group_mean(hits, suffix),
+         
+         pageviews.mean.visitNumber = group_mean(pageviews, visitNumber),
+         pageviews.mean.browser = group_mean(pageviews, browser),
+         pageviews.mean.operatingSystem = group_mean(pageviews, operatingSystem),
+         pageviews.mean.subContinent = group_mean(pageviews, subContinent),
+         pageviews.mean.country = group_mean(pageviews, country),
+         pageviews.mean.city = group_mean(pageviews, city),
+         pageviews.mean.metro = group_mean(pageviews, metro),
+         pageviews.mean.suffix = group_mean(pageviews, suffix))
+
+
+
+# grabbo le ore dall'orario di visita
+combi = combi %>%
+  mutate(visitStartHour = visitStartTime %>% as.POSIXct(., origin = "1970-01-01") %>% hour())
+
+
+
+
 ############################
 
 
