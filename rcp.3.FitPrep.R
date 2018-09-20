@@ -79,9 +79,10 @@ test = combi[-isTrain, !(colnames(combi) %in% "fullVisitorId")]
 
 # ranger
 rangerXTrain = sparse.model.matrix(~ 0 + ., train)
-#rangerXTest = sparse.model.matrix(~ 0 + ., test) ~ interesting, test ha alcuni factor completamente in NA
+rangerXTest = sparse.model.matrix(transactionRevenue ~ 0 + ., test)
 
 save(rangerXTrain, file = "modelMatrixTrain_ranger.RData")
+save(rangerXTest, file = "modelMatrixTest_ranger.RData")
 
 # xgboost e glmnet
 yTrain = Matrix(as.matrix(train[, "transactionRevenue"]), sparse = T)
