@@ -12,7 +12,7 @@ print(system.time(
 rfModel <- ranger(dependent.variable.name = "transactionRevenue",
                   data = rangerXTrain,
                   num.trees = 10,
-                  mtry = c(5, 10), # defaults to sqrt(p)
+                  mtry = 500, # defaults to sqrt(p)
                   importance = "impurity") 
 
 ))
