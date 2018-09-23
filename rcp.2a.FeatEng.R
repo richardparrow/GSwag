@@ -14,10 +14,11 @@ combi = rbind(train, test)
 # date things
 combi = combi %>%
   mutate(date = date %>% ymd(),
-         year = date %>% year(),
-         week = date %>% week(),
-         wday = date %>% wday(week_start = getOption("lubridate.week.start", 1))) # così parte dal Lunedì
+         year = date %>% year() - 2016, #così dovrebbe creare più zeri e alleggerire
+         week = date %>% week() - 1, #stesso motivo
+         wday = date %>% wday(week_start = getOption("lubridate.week.start", 1)) %>% as.factor()) # così parte dal Lunedì
 
+levels(combi$wday) = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 # .com nel dominio - per ora commentato perché suffix dovrebbe fare tutto
 #combi = combi %>%
@@ -32,23 +33,36 @@ domainSplit = lapply(combi[, "networkDomain"], function(x) suffix_extract(domain
 combi = cbind(combi, domainSplit$networkDomain) %>% 
   as.tibble() %>%
   select(-host) %>%
+  mutate(dotSomething = suffix %>% str_match("com|co|net|gov|org|edu") %>% str_remove_all("[.]"),
+         suffix = ifelse(suffix == dotSomething, "noCountry", suffix) %>% str_remove_all("com|co|net|gov|org|edu") %>% str_remove_all("[.]")) %>%
   replace_na(list(subdomain = "Not Available",
                   domain = "Not Available",
-                  suffix = "Not Available")) %>%
+                  suffix = "Not Available",
+                  dotSomething = "Not Available")) %>%
   mutate(subdomain = subdomain %>% as.factor(),
          domain = domain %>% as.factor(),
-         suffix = suffix %>% str_remove_all("com.|net.") %>% as.factor())
+         suffix = suffix %>% as.factor(),
+         dotSomething = dotSomething %>% as.factor())
 
 
 # tengo solo i suffissi che hanno mean(target) != 0
-suffixMean = combi[1:nrow(train), ] %>%
-  group_by(suffix) %>%
-  summarise(transactionMean = transactionRevenue %>% mean())
+#suffixMean = combi[1:nrow(train), ] %>%
+#  group_by(suffix) %>%
+#  summarise(transactionMean = transactionRevenue %>% mean())
 
-suffixOther = as.character(suffixMean$suffix[which(suffixMean$transactionMean == 0)])
+#suffixOther = as.character(suffixMean$suffix[which(suffixMean$transactionMean == 0)])
 
+#combi = combi %>%
+#  mutate(suffix = suffix %>% fct_collapse(other = suffixOther))
+
+
+
+# provo a normalizzare hits e pageviews
 combi = combi %>%
-  mutate(suffix = suffix %>% fct_collapse(other = suffixOther))
+  mutate(hits = hits %>% scale(),
+         pageviews = pageviews %>% scale())
+
+
 
 
 # hist e pageviews dominano, provo a fare un po' di shit
@@ -78,7 +92,6 @@ combi = combi %>%
 # grabbo le ore dall'orario di visita
 combi = combi %>%
   mutate(visitStartHour = visitStartTime %>% as.POSIXct(., origin = "1970-01-01") %>% hour())
-
 
 
 

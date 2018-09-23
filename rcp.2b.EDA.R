@@ -33,11 +33,11 @@ train %>%
 #  summarise(mean = transactionRevenue %>% mean()) %>%
 #  ggplot() + aes(x = week, y = mean, colour = dotNet, fill = dotNet) + geom_point() + geom_smooth(method = "loess", alpha = .2)
 
-# .com & .net
+# .com & .net ecc.
 train %>% 
-  group_by(week, dotComNet) %>% 
+  group_by(week, dotSomething) %>% 
   summarise(mean = transactionRevenue %>% mean()) %>%
-  ggplot() + aes(x = week, y = mean, colour = dotComNet, fill = dotComNet) + geom_point() + geom_smooth(method = "loess", alpha = .2)
+  ggplot() + aes(x = week, y = mean, colour = dotSomething, fill = dotSomething) + geom_point() + geom_smooth(method = "loess", alpha = .2)
 
 # Tra domainNetwork .com vs altri c'è molta separazione.
 
