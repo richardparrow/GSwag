@@ -44,7 +44,7 @@ rfFitTwo = predict(rfTwo, rangerXTrain)
 rfFitTwo = rfFitTwo$predictions
 plot(density(rangerXTrain[, "transactionRevenue"], from = 0, bw = 1))
 lines(density(rfFitOne, from = 0, bw = 1), col = "red")
-lines(density(rfFitOne, from = 0, bw = 1), col = "blue")
+lines(density(rfFitTwo, from = 0, bw = 1), col = "blue")
 dev.off()
 
 gc()
